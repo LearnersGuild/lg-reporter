@@ -2,7 +2,6 @@ require './slack'
 
 require 'asana'
 require 'httparty'
-require 'pry'
 
 class Reporter
   PAGINATION_LIMIT = 2
