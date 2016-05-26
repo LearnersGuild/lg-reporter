@@ -18,12 +18,13 @@ class Reporter
 
   def reports(team_name)
     opts = {
-      fields: [ 'name', 'owner', 'current_status', 'public' ],
-      expand: [ 'owner', 'current_status' ]
+      fields: [ 'name', 'owner.name', 'current_status', 'public' ],
+      expand: [ 'current_status' ]
     }
 
     projects(team_name, opts).select(&:public).map do |proj|
       name = proj.name
+      proj_link = "https://app.asana.com/0/#{proj.id}/list"
       status_text = 'No update'
       color = nil
       owner_name = proj.owner && proj.owner['name']
@@ -33,7 +34,11 @@ class Reporter
         color = translate_color_to_slack(proj.current_status['color'])
       end
 
-      { title: name, text: status_text, color: color, owner: owner_name }
+      { title: name,
+        title_link: proj_link,
+        author_name: owner_name,
+        text: status_text,
+        color: color }
     end
   end
 
