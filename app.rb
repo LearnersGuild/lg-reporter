@@ -4,6 +4,11 @@ require 'rdiscount'
 
 require './reporter'
 
+unless ENV['RACK_ENV'] == 'production'
+  require 'dotenv'
+  Dotenv.load
+end
+
 post '/' do
   team = params['text'].chomp
   user = params['user_name']
@@ -11,9 +16,6 @@ post '/' do
 
   logger.info("Request Params:")
   logger.info(params)
-
-  require 'dotenv'
-  Dotenv.load
 
   r = Reporter.new(ENV['ASANA_TOKEN'], ENV['ASANA_WORKSPACE_ID'])
 
