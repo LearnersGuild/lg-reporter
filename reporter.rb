@@ -28,16 +28,19 @@ class Reporter
       status_text = 'No update'
       color = nil
       owner_name = proj.owner && proj.owner['name']
+      timestamp = nil
 
       if proj.current_status
         status_text = proj.current_status['text']
         color = translate_color_to_slack(proj.current_status['color'])
+        timestamp = Date.parse(proj.current_status['modified_at']).to_time.to_i
       end
 
       { title: name,
         title_link: proj_link,
         author_name: owner_name,
         text: status_text,
+        ts: timestamp,
         color: color }
     end
   end
