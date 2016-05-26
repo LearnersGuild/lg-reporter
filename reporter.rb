@@ -18,15 +18,22 @@ class Reporter
 
   def reports(team_name)
     opts = {
-      fields: [ 'name', 'owner', 'current_status' ],
+      fields: [ 'name', 'owner', 'current_status', 'public' ],
       expand: [ 'owner', 'current_status' ]
     }
 
-    projects(team_name, opts).select(&:current_status).map do |proj|
-      text = proj.current_status['text']
-      color = translate_color_to_slack(proj.current_status['color'])
+    projects(team_name, opts).select(&:public).map do |proj|
+      name = proj.name
+      status_text = 'No update'
+      color = nil
+      owner_name = proj.owner && proj.owner['name']
 
-      { text: text, color: color }
+      if proj.current_status
+        status_text = proj.current_status['text']
+        color = translate_color_to_slack(proj.current_status['color'])
+      end
+
+      { title: name, text: status_text, color: color, owner: owner_name }
     end
   end
 
