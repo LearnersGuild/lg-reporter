@@ -14,17 +14,21 @@ post '/' do
   user = params['user_name']
   response_url = params['response_url']
 
-  logger.info("Request Params:")
-  logger.info(params)
+  unless team.empty?
+    logger.info("Request Params:")
+    logger.info(params)
 
-  r = Reporter.new(ENV['ASANA_TOKEN'], ENV['ASANA_WORKSPACE_ID'])
+    r = Reporter.new(ENV['ASANA_TOKEN'], ENV['ASANA_WORKSPACE_ID'])
 
-  reports = r.reports(team)
+    reports = r.reports(team)
 
-  slack_message = Slack::Response.new("Reports for team #{team}:", 'ephemeral')
-  slack_message.attachments = reports
+    slack_message = Slack::Response.new("Reports for team #{team}:", 'ephemeral')
+    slack_message.attachments = reports
 
-  res = slack_message.data
+    res = slack_message.data
+  else
+    res = Slack::Response.new('No team provided.').data
+  end
 
   logger.info("Response Body:")
   logger.info(res.to_json)
