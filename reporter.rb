@@ -22,15 +22,10 @@ class Reporter
       expand: [ 'current_status' ]
     }
 
-    projects(team_name, opts).reject do |proj|
-      one_week_ago = Time.now.to_i - (7 * 24 * 60 * 60)
-
-      proj.current_status && \
-        parse_ts(proj.current_status['modified_at']) < one_week_ago
-    end.map do |proj|
+    projects(team_name, opts).map do |proj|
       name = proj.name
       proj_link = "https://app.asana.com/0/#{proj.id}/list"
-      status_text = 'No status'
+      status_text = 'No status. Is this project active?'
       color = nil
       owner_name = proj.owner && proj.owner['name']
       timestamp = nil
@@ -39,6 +34,9 @@ class Reporter
         status_text = proj.current_status['text']
         color = translate_color_to_slack(proj.current_status['color'])
         timestamp = parse_ts(proj.current_status['modified_at'])
+
+        one_week_ago = Time.now.to_i - (7 * 24 * 60 * 60)
+        status_text = 'No update in the last week.' if timestamp < one_week_ago
       end
 
       { title: name,
