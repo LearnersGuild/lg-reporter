@@ -27,7 +27,7 @@ post '/' do
 
     res = slack_message.data
   else
-    res = Slack::Response.new('No team provided.').data
+    res = Slack::Response.new('No team provided. Must include the name of an Asana team.').data
   end
 
   logger.info("Response Body:")

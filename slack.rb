@@ -7,6 +7,7 @@ module Slack
     def initialize(text, type='ephemeral')
       @text = text
       @type = type # options: ['in_channel', 'ephemeral']
+      @attachments = []
     end
 
     def data
