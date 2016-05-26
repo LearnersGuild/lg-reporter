@@ -4,7 +4,7 @@ require 'asana'
 require 'httparty'
 
 class Reporter
-  PAGINATION_LIMIT = 2
+  PAGINATION_LIMIT = 50 # high limit
 
   attr_reader :asana, :workspace
 

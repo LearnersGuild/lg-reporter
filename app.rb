@@ -21,7 +21,7 @@ post '/' do
 
   reports = r.reports(team)
 
-  slack_message = Slack::Response.new("Reports for team #{team}:", 'in_channel')
+  slack_message = Slack::Response.new("Reports for team #{team}:", 'ephemeral')
   slack_message.attachments = reports
 
   res = slack_message.data
