@@ -22,7 +22,7 @@ class Reporter
       expand: [ 'current_status' ]
     }
 
-    projects(team_name, opts).select(&:public).map do |proj|
+    projects(team_name, opts).map do |proj|
       name = proj.name
       proj_link = "https://app.asana.com/0/#{proj.id}/list"
       status_text = 'No update'
@@ -53,7 +53,7 @@ class Reporter
                     archived: false,
                     per_page: PAGINATION_LIMIT,
                     options: options ) \
-         .reject { |p| p.name[0] =~ /[&_]/ }
+         .reject { |p| (p.name[0] =~ /[&_]/) || p.archived || !p.public }
   end
 
   def team(team_name)
