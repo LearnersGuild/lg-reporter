@@ -1,0 +1,7 @@
+file="$1"
+
+[ ! -z "$file" ] || {
+  file=reporter.rb
+}
+
+pry -r./$file
