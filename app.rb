@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'sinatra/json'
 require 'rdiscount'
+require 'httparty'
 
 require './reporter'
 
@@ -18,14 +19,18 @@ post '/' do
     logger.info("Request Params:")
     logger.info(params)
 
-    r = Reporter.new(ENV['ASANA_TOKEN'], ENV['ASANA_WORKSPACE_ID'])
+    Thread.new do
+      r = Reporter.new(ENV['ASANA_TOKEN'], ENV['ASANA_WORKSPACE_ID'])
+      reports = r.reports(team)
 
-    reports = r.reports(team)
+      slack_message = Slack::Response.new("Reports for team #{team}:")
+      slack_message.attachments = reports
 
-    slack_message = Slack::Response.new("Reports for team #{team}:", 'ephemeral')
-    slack_message.attachments = reports
+      res = slack_message.data
+      HTTParty.post(response_url, { body: res.to_json, headers: { 'Content-Type' => 'application/json' } })
+    end
 
-    res = slack_message.data
+    slack_message = Slack::Response.new('Fetching data from Asana...').data
   else
     res = Slack::Response.new('No team provided. Must include the name of an Asana team.').data
   end
