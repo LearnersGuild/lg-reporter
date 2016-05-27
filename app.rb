@@ -30,7 +30,7 @@ post '/' do
       HTTParty.post(response_url, { body: res.to_json, headers: { 'Content-Type' => 'application/json' } })
     end
 
-    slack_message = Slack::Response.new('Fetching data from Asana...').data
+    res = Slack::Response.new('Fetching data from Asana...').data
   else
     res = Slack::Response.new('No team provided. Must include the name of an Asana team.').data
   end
