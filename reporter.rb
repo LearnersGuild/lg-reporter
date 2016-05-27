@@ -37,8 +37,8 @@ class Reporter
         color = translate_color_to_slack(proj.current_status['color'])
         timestamp = parse_ts(proj.current_status['modified_at'])
 
-        one_week_ago = Time.now.to_i - (7 * 24 * 60 * 60)
-        status_text = 'No update in the last week.' if timestamp < one_week_ago
+        # one_week_ago = Time.now.to_i - (7 * 24 * 60 * 60)
+        # status_text = 'No update in the last week.' if timestamp < one_week_ago
       end
 
       { title: name,
