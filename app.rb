@@ -39,8 +39,6 @@ post '/' do
     end
 
     res = Slack::Response.new('Fetching data from Asana...').data
-  else
-
   end
 
   logger.info("Response Body:")
