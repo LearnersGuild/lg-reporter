@@ -16,13 +16,15 @@ class Reporter
     @workspace = @asana.workspaces.find_by_id(asana_workspace_id)
   end
 
-  def reports(team_name)
-    opts = {
+  def default_opts
+    {
       fields: [ 'name', 'owner.name', 'current_status', 'public' ],
       expand: [ 'current_status' ]
     }
+  end
 
-    projects(team_name, opts).map do |proj|
+  def reports(team_name)
+    projects(team_name).map do |proj|
       name = proj.name
       proj_link = "https://app.asana.com/0/#{proj.id}/list"
       status_text = 'No status. Is this project active?'
@@ -48,20 +50,29 @@ class Reporter
     end
   end
 
-  def projects(team_name, options = {})
+  def goals(options = nil)
+    asana.projects \
+         .find_all( workspace: workspace.id,
+                    archived: false,
+                    per_page: PAGINATION_LIMIT,
+                    options: options || default_opts ) \
+         .select { |p| p.name[0] == '!' }
+  end
+
+  def projects(team_name, options = nil)
     team = team(team_name)
     asana.projects \
          .find_all( workspace: workspace.id,
                     team: team.id,
                     archived: false,
                     per_page: PAGINATION_LIMIT,
-                    options: options ) \
+                    options: options || default_opts ) \
          .reject { |p| (p.name[0] =~ /[&_]/) || p.archived || !p.public }
   end
 
   def team(team_name)
     asana.teams.find_by_organization(organization: workspace.id) \
-         .find { |t| t.name == team_name }
+         .find { |t| t.name.downcase == team_name.downcase }
   end
 
   def user(name)

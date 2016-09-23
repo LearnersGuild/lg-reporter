@@ -15,15 +15,23 @@ post '/' do
   user = params['user_name']
   response_url = params['response_url']
 
-  unless team.empty?
+  if team.empty?
+    res = Slack::Response.new('No team provided. Must include the name of an Asana team, for example: "GCC"').data
+  else
     logger.info("Request Params:")
     logger.info(params)
 
     Thread.new do
       r = Reporter.new(ENV['ASANA_TOKEN'], ENV['ASANA_WORKSPACE_ID'])
-      reports = r.reports(team)
 
-      slack_message = Slack::Response.new("Reports for team #{team}:")
+      if team.downcase == 'goals'
+        reports = r.goals
+        slack_message = Slack::Response.new("Current critical strategic goals:")
+      else
+        reports = r.reports(team)
+        slack_message = Slack::Response.new("Reports for team #{team}:")
+      end
+
       slack_message.attachments = reports
 
       res = slack_message.data
@@ -32,7 +40,7 @@ post '/' do
 
     res = Slack::Response.new('Fetching data from Asana...').data
   else
-    res = Slack::Response.new('No team provided. Must include the name of an Asana team.').data
+
   end
 
   logger.info("Response Body:")
